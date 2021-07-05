@@ -20,7 +20,12 @@ if [[ -n $3 ]] ; then
   INFILE="--infile $3"
 fi
 
-cmsswSequenceInfo.py --runTheMatrix --steps DQM,VALIDATION $INFILE $SECTION --dbfile "$DBFILE" $THREADS
+PLUGIN_FILE=""
+if [ -e ${CMSSW_BASE}/tmp/TestDQMOfflineConfiguration_DumpPlugins.json ] ; then
+  PLUGIN_FILE="--plugins ${CMSSW_BASE}/tmp/TestDQMOfflineConfiguration_DumpPlugins.json"
+fi
+
+cmsswSequenceInfo.py --runTheMatrix --steps DQM,VALIDATION $INFILE $PLUGIN_FILE $SECTION --dbfile "$DBFILE" $THREADS
 sqlite3 "$DBFILE"  > "legacymodules-${DBFILE}.txt" <<SQL
 SELECT edmfamily, edmbase, classname, instancename, step, seqname, wfid 
 FROM plugin 

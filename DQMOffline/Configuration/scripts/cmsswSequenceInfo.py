@@ -30,6 +30,9 @@ BLACKLIST='^(TriggerResults|.*_step|DQMoutput|siPixelDigis)$'
 # Set later from commandline args
 RELEVANTSTEPS = []
 
+# EDM Plugins information {"pluginname": ["baseclass", "library"]}
+EDM_PLUGINS = {}
+
 @functools.lru_cache(maxsize=None)
 def inspectsequence(seq):
     sep = ":"
@@ -123,11 +126,16 @@ def inspectsequence(seq):
 # times for the same module (e.g. across different wf).
 @functools.lru_cache(maxsize=None)
 def getplugininfo(pluginname):
-    plugindump = subprocess.check_output(["edmPluginHelp", "-p", pluginname])
-    line = plugindump.splitlines()[0].decode()
-    # we care only about the edm base class for now.
-    pluginre = re.compile(".* " + pluginname + ".*[(]((\w+)::)?(\w+)[)]")
-    m = pluginre.match(line)
+    reg_base = '[(]((\w+)::)?(\w+)[)]'
+    m = None
+    if pluginname in EDM_PLUGINS:
+        m = re.match('^%s$' % reg_base, EDM_PLUGINS[pluginname][0])
+    else:
+        plugindump = subprocess.check_output(["edmPluginHelp", "-p", pluginname])
+        line = plugindump.splitlines()[0].decode()
+        # we care only about the edm base class for now.
+        pluginre = re.compile(".* " + pluginname + ".*%s" % reg_base)
+        m = pluginre.match(line)
     if not m:
         # this should never happen, but sometimes the Tracer does report things that are not actually plugins. 
         return (pluginname, ("", ""))
@@ -500,6 +508,7 @@ if __name__ == "__main__":
     parser.add_argument("--threads", default=None, type=int, help="Use a fixed number of threads (default is #cores).")
     parser.add_argument("--limit", default=None, type=int, help="Process only this many sequences.")
     parser.add_argument("--offset", default=None, type=int, help="Process sequences starting from this index. Used with --limit to divide the work into jobs.")
+    parser.add_argument("--plugins", default=None, help="Json file with edm plugins information. Default is to run edmPluginHelp.")
     parser.add_argument("--showpluginlabel", default=False, action="store_true", help="Print the module label for each plugin (default).")
     parser.add_argument("--showplugintype", default=False, action="store_true", help="Print the base class for each plugin.")
     parser.add_argument("--showpluginclass", default=False, action="store_true", help="Print the class name for each plugin.")
@@ -516,6 +525,11 @@ if __name__ == "__main__":
       stp = ThreadPool(args.threads)
 
     INFILE = args.infile
+    if args.plugins:
+        with open(args.plugins) as ref:
+            import json
+            EDM_PLUGINS = json.load(ref)
+
     if args.serve:
         serve()
     elif args.workflow or args.runTheMatrix:
