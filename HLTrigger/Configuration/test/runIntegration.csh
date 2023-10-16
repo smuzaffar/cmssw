@@ -5,6 +5,11 @@ eval `scram runtime -csh`
 echo
 date +%F\ %a\ %T
 echo Starting $0 $1 $2
+set JOBS=$3
+if ( "$JOBS" == "" ) then
+  #By default run 4 jobs in parallel
+  set JOBS=4
+endif
 
 if ( $2 == "" ) then
   set tables = ( GRun )
@@ -41,7 +46,7 @@ foreach gtag ( $1 )
 
     set infile = file:../RelVal_Raw_${table}_${gtag}.root
 
-    set hltIntegTestCmd = "hltIntegrationTests OnLine_HLT_${table}.py ${extraflags} -d ${name} -i ${infile} -n 100 -j 4 -a cpu"
+    set hltIntegTestCmd = "hltIntegrationTests OnLine_HLT_${table}.py ${extraflags} -d ${name} -i ${infile} -n 100 -j ${JOBS} -a cpu"
 
     echo "`date +%T` ${hltIntegTestCmd} >& ${name}.log"
     time ${hltIntegTestCmd} >& ${name}.log

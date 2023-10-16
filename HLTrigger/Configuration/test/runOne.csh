@@ -9,6 +9,12 @@ echo
 date +%F\ %a\ %T
 echo Starting $0 $1 $2
 
+set JOBS=$3
+if ( "$JOBS" == "" ) then
+  #By default run 4 jobs in parallel
+  set JOBS=4
+endif
+
 if ( $2 == "" ) then
   set tables = ( GRun )
 else if ( ($2 == all) || ($2 == ALL) ) then
@@ -49,16 +55,23 @@ foreach gtag ( $1 )
       set name = ${task}_${table}_${gtag}
       rm -f $name.{log,root}
 
+      #wait if more than ${JOBS} jobs are already running
+      jobs >& bg_jobs
+      while ( `cat bg_jobs |wc -l; rm -f bg_jobs` > $JOBS )
+        sleep 1
+        jobs >& bg_jobs
+      end
+
       if ( $task == OnLine_HLT ) then
         set short = ${task}_${table}
         echo "`date +%T` cmsRun $short.py realData=${realData} globalTag="@" inputFiles="@" >& $name.log"
 #       ls -l        $short.py
-        time  cmsRun $short.py realData=${realData} globalTag="@" inputFiles="@" >& $name.log
+        time  cmsRun $short.py realData=${realData} globalTag="@" inputFiles="@" >& $name.log &
         echo "`date +%T` exit status: $?"
       else
         echo "`date +%T` cmsRun $name.py >& $name.log"
 #       ls -l        $name.py
-        time  cmsRun $name.py >& $name.log
+        time  cmsRun $name.py >& $name.log &
         echo "`date +%T` exit status: $?"
       endif
 
@@ -74,6 +87,9 @@ foreach gtag ( $1 )
 
 end
 
+#wait for all jobs to finish
+wait
+
 # separate hlt+reco and reco+(validation)+dqm workflows
 
 foreach gtag ( $1 )
@@ -88,12 +104,19 @@ foreach gtag ( $1 )
 
     foreach task ( $base )
 
+      #wait if more than ${JOBS} jobs are already running
+      jobs >& bg_jobs
+      while ( `cat bg_jobs |wc -l; rm -f bg_jobs` > $JOBS )
+        sleep 1
+        jobs >& bg_jobs
+      end
+
       echo
       set name = ${task}_${table}_${gtag}
       rm -f $name.{log,root}
       echo "`date +%T` cmsRun $name.py >& $name.log"
 #     ls -l        $name.py
-      time  cmsRun $name.py >& $name.log
+      time  cmsRun $name.py >& $name.log &
       echo "`date +%T` exit status: $?"
 
     end
@@ -102,10 +125,13 @@ foreach gtag ( $1 )
 
 end
 
+#wait for all jobs to finish
+wait
+
 # running each HLT trigger path individually one by one
 
 if ( ($2 != all) && ($2 != ib) && ($2 != dev) && ($2 != full) && ($2 != fake) && ($2 != frozen) ) then
-  ./runIntegration.csh $1 $2
+  ./runIntegration.csh $1 $2 ${JOBS}
 endif
 
 echo
