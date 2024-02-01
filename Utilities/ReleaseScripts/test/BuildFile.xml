@@ -12,3 +12,6 @@
   <bin name="test-valgrind-memleak" file="test-valgrind-memleak.cpp"/>
 </ifrelease>
 <test name="SCRAM_PreTest" command="touch SCRAM_PreTest.txt"/>
+<test name="SCRAM_Test" command="test -e SCRAM_PreTest.txt  &amp;&amp;  touch SCRAM_Test.txt">
+  <flags PRE_TEST="SCRAM_PreTest"/>
+</test>
