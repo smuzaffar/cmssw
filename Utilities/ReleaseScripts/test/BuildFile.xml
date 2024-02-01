@@ -15,3 +15,6 @@
 <test name="SCRAM_Test" command="test -e SCRAM_PreTest.txt &amp;&amp; touch SCRAM_Test.txt">
   <flags PRE_TEST="SCRAM_PreTest"/>
 </test>
+<test name="SCRAM_PostTest" command="test -e SCRAM_Test.txt">
+  <flags PRE_TEST="SCRAM_Test"/>
+</test>
