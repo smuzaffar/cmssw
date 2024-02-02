@@ -5,7 +5,7 @@ import sys
 
 
 fileName = sys.argv[1]
-
+#
 f = open(fileName,'r')
 
 messageToIgnore = [
