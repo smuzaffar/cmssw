@@ -2,6 +2,8 @@
 from __future__ import print_function
 import sys
 
+
+
 fileName = sys.argv[1]
 
 f = open(fileName,'r')
