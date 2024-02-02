@@ -7,3 +7,4 @@ a         { text-decoration: none; }
 a.obj     { color: #007700; }
 a.func    { color: #000077; }
 a:hover  { text-decoration: underline; }
+foo
