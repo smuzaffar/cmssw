@@ -387,7 +387,7 @@ namespace mkfit {
   //==============================================================================
 
   void Track::resizeHitsForInput() {
-    bzero(&hitsOnTrk_, sizeof(hitsOnTrk_));
+    hitsOnTrk_.clear();
     hitsOnTrk_.resize(lastHitIdx_ + 1);
   }
 
