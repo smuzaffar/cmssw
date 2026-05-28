@@ -16,13 +16,13 @@
 #include "Geometry/CommonDetUnit/interface/StackGeomDet.h"
 #include <cmath>
 
-AlignableStackDet::AlignableStackDet(const StackGeomDet* stackedDet)
-    : AlignableDet(stackedDet, true),  // true: adding DetUnits
-      theLowerDetSurface(stackedDet->lowerDet()->surface()) {
+AlignableStackDet::AlignableStackDet(const DoubleSensGeomDet* det)
+    : AlignableDet(det, true),  // true: adding DetUnits
+      theLowerDetSurface(det->firstDet()->surface()) {
   // check order lower/upper
   const Alignables units(this->components());
-  if (units.size() != 2 || stackedDet->lowerDet()->geographicalId() != units[0]->geomDetId() ||
-      stackedDet->upperDet()->geographicalId() != units[1]->geomDetId()) {
+  if (units.size() != 2 || det->firstDet()->geographicalId() != units[0]->geomDetId() ||
+      det->secondDet()->geographicalId() != units[1]->geomDetId()) {
     throw cms::Exception("LogicError") << "[AlignableStackDet] "
                                        << "Either != 2 components or "
                                        << "upper/lower in wrong order for consistifyAlignments.";

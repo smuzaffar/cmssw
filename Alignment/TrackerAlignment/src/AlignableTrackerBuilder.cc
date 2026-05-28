@@ -205,32 +205,32 @@ void AlignableTrackerBuilder ::buildStripDetectorAlignable(
   if (!detId.glued()) {
     if (!geomDet->components().empty()) {
       // 2D-module, convert it to GluedGeomDet
-      const GluedGeomDet* gluedGeomDet = dynamic_cast<const GluedGeomDet*>(geomDet);
-      if (!gluedGeomDet) {
-        throw cms::Exception("LogicError") << "[AlignableTrackerBuilder] dynamic_cast<const GluedGeomDet*> "
+      const DoubleSensGeomDet* doubleGeomDet = dynamic_cast<const DoubleSensGeomDet*>(geomDet);
+      if (!doubleGeomDet) {
+        throw cms::Exception("LogicError") << "[AlignableTrackerBuilder] dynamic_cast<const DoubleSensGeomDet*> "
                                            << "failed.";
       }
 
       // components (AlignableDetUnits) constructed within
       if (update) {
-        auto ali = std::find_if(aliDets.cbegin(), aliDets.cend(), [&gluedGeomDet](const auto& i) {
-          return i->id() == gluedGeomDet->geographicalId().rawId();
+        auto ali = std::find_if(aliDets.cbegin(), aliDets.cend(), [&doubleGeomDet](const auto& i) {
+          return i->id() == doubleGeomDet->geographicalId().rawId();
         });
         if (ali != aliDets.end()) {
           auto aliSiStripDet = dynamic_cast<AlignableSiStripDet*>(*ali);
           if (aliSiStripDet) {
-            aliSiStripDet->update(gluedGeomDet);
+            aliSiStripDet->update(doubleGeomDet);
           } else {
             throw cms::Exception("LogicError") << "[AlignableTrackerBuilder::buildStripDetectorAlignable] "
                                                << "cast to 'AlignableSiStripDet*' failed while it should not\n";
           }
         } else {
-          throw cms::Exception("GeometryMismatch")
-              << "[AlignableTrackerBuilder::buildStripDetectorAlignable] "
-              << "GeomDet with DetId " << gluedGeomDet->geographicalId().rawId() << " not found in current geometry.\n";
+          throw cms::Exception("GeometryMismatch") << "[AlignableTrackerBuilder::buildStripDetectorAlignable] "
+                                                   << "GeomDet with DetId " << doubleGeomDet->geographicalId().rawId()
+                                                   << " not found in current geometry.\n";
         }
       } else {
-        aliDets.push_back(new AlignableSiStripDet(gluedGeomDet));
+        aliDets.push_back(new AlignableSiStripDet(doubleGeomDet));
       }
       const auto& addAliDetUnits = aliDets.back()->components();
       const auto& nAddedUnits = addAliDetUnits.size();
@@ -256,16 +256,16 @@ void AlignableTrackerBuilder ::buildOuterTrackerDetectorAlignable(
   // hopefully all the geomdets are composite (either PS or SS modules in Ph-2 Outer Tracker)
   if (!geomDet->components().empty()) {
     // 2D-module, convert it to StackGeomDet
-    const StackGeomDet* stackGeomDet = dynamic_cast<const StackGeomDet*>(geomDet);
-    if (!stackGeomDet) {
-      throw cms::Exception("LogicError") << "[AlignableTrackerBuilder] dynamic_cast<const StackGeomDet*> "
+    const DoubleSensGeomDet* doubleGeomDet = dynamic_cast<const DoubleSensGeomDet*>(geomDet);
+    if (!doubleGeomDet) {
+      throw cms::Exception("LogicError") << "[AlignableTrackerBuilder] dynamic_cast<const doubleSensGeomDet*> "
                                          << "failed.";
     }
 
     // components (AlignableDetUnits) constructed within
     if (update) {
-      auto ali = std::find_if(aliDets.cbegin(), aliDets.cend(), [&stackGeomDet](const auto& i) {
-        return i->id() == stackGeomDet->geographicalId().rawId();
+      auto ali = std::find_if(aliDets.cbegin(), aliDets.cend(), [&doubleGeomDet](const auto& i) {
+        return i->id() == doubleGeomDet->geographicalId().rawId();
       });
       if (ali != aliDets.end()) {
         auto aliStackDet = dynamic_cast<AlignableStackDet*>(*ali);
@@ -278,10 +278,10 @@ void AlignableTrackerBuilder ::buildOuterTrackerDetectorAlignable(
       } else {
         throw cms::Exception("GeometryMismatch")
             << "[AlignableTrackerBuilder::buildStripDetectorAlignable] "
-            << "GeomDet with DetId " << stackGeomDet->geographicalId().rawId() << " not found in current geometry.\n";
+            << "GeomDet with DetId " << doubleGeomDet->geographicalId().rawId() << " not found in current geometry.\n";
       }
     } else {
-      aliDets.push_back(new AlignableStackDet(stackGeomDet));
+      aliDets.push_back(new AlignableStackDet(doubleGeomDet));
     }
     const auto& addAliDetUnits = aliDets.back()->components();
     const auto& nAddedUnits = addAliDetUnits.size();

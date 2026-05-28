@@ -15,7 +15,7 @@
 #include "DataFormats/GeometryCommonDetAlgo/interface/GlobalError.h"
 #include "DataFormats/GeometrySurface/interface/BoundPlane.h"
 #include "Geometry/TrackerGeometryBuilder/interface/PlaneBuilderForGluedDet.h"
-#include "Geometry/CommonDetUnit/interface/GluedGeomDet.h"
+#include "Geometry/CommonDetUnit/interface/DoubleSensGeomDet.h"
 #include "Geometry/TrackerGeometryBuilder/interface/StripGeomDetUnit.h"
 
 #include "FWCore/Utilities/interface/Exception.h"
@@ -23,12 +23,12 @@
 
 #include <cmath>
 
-AlignableSiStripDet::AlignableSiStripDet(const GluedGeomDet* gluedDet)
-    : AlignableDet(gluedDet, true),  // true: adding DetUnits
-      theMonoBounds(gluedDet->monoDet()->surface().bounds().clone()),
-      theStereoBounds(gluedDet->stereoDet()->surface().bounds().clone()),
-      theMonoType(static_cast<const StripGeomDetUnit*>(gluedDet->monoDet())->specificType()),
-      theStereoType(static_cast<const StripGeomDetUnit*>(gluedDet->stereoDet())->specificType()) {
+AlignableSiStripDet::AlignableSiStripDet(const DoubleSensGeomDet* det)
+    : AlignableDet(det, true),  // true: adding DetUnits
+      theMonoBounds(det->firstDet()->surface().bounds().clone()),
+      theStereoBounds(det->secondDet()->surface().bounds().clone()),
+      theMonoType(static_cast<const StripGeomDetUnit*>(det->firstDet())->specificType()),
+      theStereoType(static_cast<const StripGeomDetUnit*>(det->secondDet())->specificType()) {
   // It is not allowed to store a pointer to GeomDet within objects with a life time
   // longer than an Event:
   // GeomDet comes from TrackerGeometry that is created from GeometricDet that depends on
@@ -39,8 +39,8 @@ AlignableSiStripDet::AlignableSiStripDet(const GluedGeomDet* gluedDet)
 
   // check order mono/stereo
   const Alignables units(this->components());
-  if (units.size() != 2 || gluedDet->monoDet()->geographicalId() != units[0]->geomDetId() ||
-      gluedDet->stereoDet()->geographicalId() != units[1]->geomDetId()) {
+  if (units.size() != 2 || det->firstDet()->geographicalId() != units[0]->geomDetId() ||
+      det->secondDet()->geographicalId() != units[1]->geomDetId()) {
     throw cms::Exception("LogicError") << "[AlignableSiStripDet] "
                                        << "Either != 2 components or "
                                        << "mono/stereo in wrong order for consistifyAlignments.";

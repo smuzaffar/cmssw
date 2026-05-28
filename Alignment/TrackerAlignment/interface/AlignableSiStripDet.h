@@ -15,7 +15,7 @@
 
 #include <vector>
 
-class GluedGeomDet;
+class DoubleSensGeomDet;
 class AlignTransformErrorExtended;
 class Bounds;
 class StripGeomDetType;
@@ -23,7 +23,7 @@ class StripGeomDetType;
 class AlignableSiStripDet : public AlignableDet {
 public:
   /// Constructor
-  AlignableSiStripDet(const GluedGeomDet *geomDet);
+  AlignableSiStripDet(const DoubleSensGeomDet *geomDet);
   /// reduntantly make destructor virtual
   ~AlignableSiStripDet() override;
 

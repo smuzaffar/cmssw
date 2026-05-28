@@ -12,7 +12,7 @@
  */
 
 #include "Alignment/CommonAlignment/interface/AlignableDet.h"
-#include "Geometry/CommonDetUnit/interface/StackGeomDet.h"
+#include "Geometry/CommonDetUnit/interface/DoubleSensGeomDet.h"
 
 class AlignTransformErrorExtended;
 class Bounds;
@@ -21,7 +21,7 @@ class StripGeomDetType;
 class AlignableStackDet : public AlignableDet {
 public:
   /// Constructor
-  AlignableStackDet(const StackGeomDet *geomDet);
+  AlignableStackDet(const DoubleSensGeomDet *det);
   /// reduntantly make destructor virtual
   ~AlignableStackDet() override = default;
 
