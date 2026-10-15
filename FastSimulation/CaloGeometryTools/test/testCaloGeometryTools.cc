@@ -116,7 +116,6 @@ void testCaloGeometryTools::analyze(const edm::Event& iEvent, const edm::EventSe
   // Take a point in the barrel
   XYZPoint p1(129, 0., -50);
   testpoint(p1, "barrel", true, &random, myGeometry);
-  XYZPoint p2(60, 60, -317);
   testpoint(p1, "endcap", false, &random, myGeometry);
 
   checkSM(myGeometry);
